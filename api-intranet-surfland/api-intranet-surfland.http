@@ -1,0 +1,6 @@
+@api_intranet_surfland_HostAddress = http://localhost:5043
+
+GET {{api_intranet_surfland_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
