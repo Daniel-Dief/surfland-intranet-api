@@ -30,4 +30,34 @@ public class TokenService {
             token = tokenString
         };
     }
+    public static ClaimsPrincipal ValidateToken(string token) {
+        try {
+            DotNetEnv.Env.Load();
+            var key = Encoding.ASCII.GetBytes(
+                Environment.GetEnvironmentVariable("TOKEN_KEY")
+            );
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var validationParameters = new TokenValidationParameters {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero
+            };
+
+            var principal = tokenHandler.ValidateToken(token, validationParameters, out var validatedToken);
+
+            if (validatedToken is JwtSecurityToken jwtToken &&
+                jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase)) {
+                return principal;
+            }
+
+            throw new SecurityTokenException("Token inválido");
+        } catch (Exception ex) {
+            Console.WriteLine($"Erro ao validar token: {ex.Message}");
+            return null; // Retorna null se o token for inválido
+        }
+    }
 }

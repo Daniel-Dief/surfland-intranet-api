@@ -1,3 +1,4 @@
+using api_intranet_surfland.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -55,6 +56,9 @@ builder.Services.AddAuthentication(x => {
 });
 
 var app = builder.Build();
+
+//Adding Authmiddleware to ppipeline
+app.UseMiddleware<AuthMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
