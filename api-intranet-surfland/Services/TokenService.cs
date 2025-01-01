@@ -6,7 +6,7 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace api_intranet_surfland.Services; 
 public class TokenService {
-    public static object GenerateToken(DTOUser user) {
+    public static string GenerateToken(DTOUser user) {
         DotNetEnv.Env.Load();
         var key = Encoding.ASCII.GetBytes(
             Environment.GetEnvironmentVariable("TOKEN_KEY")
@@ -26,9 +26,7 @@ public class TokenService {
         var token = tokenHandler.CreateToken(tokenConfig);
         var tokenString = tokenHandler.WriteToken(token);
 
-        return new {
-            token = tokenString
-        };
+        return tokenString;
     }
     public static ClaimsPrincipal ValidateToken(string token) {
         try {

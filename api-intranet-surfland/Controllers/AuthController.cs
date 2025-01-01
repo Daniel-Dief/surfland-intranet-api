@@ -10,13 +10,16 @@ public class AuthController : ControllerBase {
     [HttpPost]
     public IActionResult Auth([FromBody] IAuthCredentials credentials) {
 
-        List<DTOUser> user = DBUsers.FindUsers(login : credentials.login);
+        DTOUser user = DBUsers.FindUsers(login : credentials.login)[0];
 
-        if (credentials.login == "admin" && credentials.password == "admin") {
-            var token = TokenService.GenerateToken(new DTOUser());
+        if (user.Password == credentials.password || user.TemporaryPassword == credentials.password) {
+            var token = TokenService.GenerateToken(user);
+
+            Response.Headers.Add("Authorization", $"Bearer {token}");
+
             return Ok(new IResponse {
                 status = true,
-                data = token
+                data = user
             });
         }
 
