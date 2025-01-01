@@ -55,9 +55,19 @@ builder.Services.AddAuthentication(x => {
     };
 });
 
+builder.Services.AddCors(options => {
+    options.AddPolicy("AllowAllOrigins", policy => {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
 var app = builder.Build();
 
-//Adding Authmiddleware to ppipeline
+app.UseCors("AllowAllOrigins");
+
+//Adding Authmiddleware to pipeline
 app.UseMiddleware<AuthMiddleware>();
 
 // Configure the HTTP request pipeline.
