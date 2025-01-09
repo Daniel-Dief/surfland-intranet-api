@@ -9,18 +9,26 @@ namespace api_intranet_surfland.Controllers;
 public class AuthController : ControllerBase {
     [HttpPost]
     public IActionResult Auth([FromBody] IAuthCredentials credentials) {
+        List<DTOUser> userList = DBUsers.FindUsers(login : credentials.login);
 
-        DTOUser user = DBUsers.FindUsers(login : credentials.login)[0];
+        if (userList.Count == 0) {
+            return BadRequest(new IResponse {
+                status = false,
+                message = "Usuário ou senha inválidos"
+            });
+        }
+
+        DTOUser user = userList[0];
 
         if (user.Password == credentials.password || user.TemporaryPassword == credentials.password) {
-            var token = TokenService.GenerateToken(user);
+        var token = TokenService.GenerateToken(user);
 
-            Response.Headers.Add("Authorization", $"Bearer {token}");
+        Response.Headers.Add("Authorization", $"Bearer {token}");
 
-            return Ok(new IResponse {
-                status = true,
-                data = user
-            });
+        return Ok(new IResponse {
+            status = true,
+            data = user
+        });
         }
 
         return BadRequest(new IResponse {
